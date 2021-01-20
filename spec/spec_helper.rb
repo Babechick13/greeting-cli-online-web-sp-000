@@ -1,29 +1,37 @@
-RSpec.configure do |config|
-  config.order = :default
-end
+require_relative "../lib/greeting.rb"
+describe './lib/greeting.rb' do
+  it 'defines a greeting method' do
+    expect(defined?(greeting)).to be_truthy
+  end
+  context '#greeting' do
+    it 'takes in an argument of a persons name' do
+      allow($stdout).to receive(:puts)
+      
+      expect{greeting("Bobby")}.to_not raise_error
+    end
+    it 'greets the person whose name was passed in as an argument' do
+      allow($stdout).to receive(:puts)
+      output = capture_puts{ greeting("Sally") }
+      expect(output).to include("Hello Sally. It's nice to meet you.")
+    end
 
-def run_file(file)
-  eval(File.read(file), binding)
-end
+    it 'greets the person with additional whitespace removed' do
+      allow($stdout).to receive(:puts)
+    #it 'greets the person with additional whitespace removed' do
+    #  allow($stdout).to receive(:puts)
 
-def get_variable_from_file(file, variable)
-  file_scope = binding
-  file_scope.eval(File.read(file))
-  
-  begin
-    return file_scope.local_variable_get(variable)
-  rescue NameError
-    raise NameError, "local variable `#{variable}' not defined in #{file}."
-  end    
-end
+      output = capture_puts{ greeting(" Sally\t   ") }
+    #  output = capture_puts{ greeting(" Sally\t   ") }
 
-def capture_puts
-  begin
-    old_stdout = $stdout
-    $stdout = StringIO.new('','w')
-    yield
-    $stdout.string
-  ensure
-    $stdout = old_stdout
+      # puts adds a newline to the output. Without using print, students
+      # will not be able to remove the \n character at the end of the phrase
+      # Strip is being used on the output for this purpose
+      expect(output.strip).to eq("Hello Sally. It's nice to meet you.")
+    end
+    # # puts adds a newline to the output. Without using print, students
+    # # will not be able to remove the \n character at the end of the phrase
+    # # Strip is being used on the output for this purpose
+    #  expect(output.strip).to eq("Hello Sally. It's nice to meet you.")
+    #end
   end
 end

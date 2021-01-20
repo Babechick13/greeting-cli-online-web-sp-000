@@ -1,39 +1,29 @@
 require_relative "../lib/greeting.rb"
-
-describe './bin/greet executing a CLI Application' do
-  it 'outputs a welcome message and asks the user for input' do
-    allow($stdout).to receive(:puts)
-    allow(self).to receive(:gets).and_return("Don")
-
-    expect($stdout).to receive(:puts).with("Hi! I'm HAL, what's your name?"), "Make sure bin/greet has code that can output 'Hi! I'm HAL, what's your name?' exactly."
-
-    run_file("./bin/greet")
+describe './lib/greeting.rb' do
+  it 'defines a greeting method' do
+    expect(defined?(greeting)).to be_truthy
   end
+  context '#greeting' do
+    it 'takes in an argument of a persons name' do
+      allow($stdout).to receive(:puts)
+      
+      expect{greeting("Bobby")}.to_not raise_error
+    end
+    it 'greets the person whose name was passed in as an argument' do
+      allow($stdout).to receive(:puts)
+      output = capture_puts{ greeting("Sally") }
+      expect(output).to include("Hello Sally. It's nice to meet you.")
+    end
+    it 'greets the person with additional whitespace removed' do
+      allow($stdout).to receive(:puts)
 
-  it 'uses #gets.strip to capture the user input and set it equal to a variable called name' do 
-    allow($stdout).to receive(:puts)
-    
-    expect(self).to receive(:gets).and_return("Don")
-    name = get_variable_from_file("./bin/greet", "name")
+      output = capture_puts{ greeting(" Sally\t   ") }
 
-    expect(name).to eq("Don")
-  end
-
-  it "calls on the #greeting method with an argument of the user's name" do 
-    allow($stdout).to receive(:puts)
-    allow(self).to receive(:gets).and_return("Don")
-
-    expect(self).to receive(:greeting).with("Don"), "Make sure the bin/greet file has code that calls the #greeting method with an argument of the user's name."
-
-    run_file("./bin/greet")
-  end
-
-  it "calls on the #greeting method with an argument of the user's name and returns the new greeting, interpolating the user's name" do 
-    allow($stdout).to receive(:puts)
-    allow(self).to receive(:gets).and_return("Don")
-
-    output = capture_puts{ run_file("./bin/greet") }
-
-    expect(output).to include("Hello Don. It's nice to meet you.")
+      expect(output).to include("Hello Sally. It's nice to meet you.")
+      # puts adds a newline to the output. Without using print, students
+      # will not be able to remove the \n character at the end of the phrase
+      # Strip is being used on the output for this purpose
+      expect(output.strip).to eq("Hello Sally. It's nice to meet you.")
+    end
   end
 end
